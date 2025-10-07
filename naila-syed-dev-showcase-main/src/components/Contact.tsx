@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { regexPatterns, regexErrors}   from "@/utils/regex.ts";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,12 @@ const Contact = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
   const { toast } = useToast();
 
   const handleChange = (
@@ -23,6 +30,11 @@ const Contact = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    if (regexPatterns[e.target.name as keyof typeof regexPatterns].test(e.target.value)) {
+      setErrors({ ...errors, [e.target.name]: "" });
+    } else {
+      setErrors({ ...errors, [e.target.name]: regexErrors[e.target.name as keyof typeof regexErrors] });
+    } // clear previous error while typing
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +46,9 @@ const Contact = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         });
+
         const data = await res.json();
+
         if(res.ok)
         {
           toast({
@@ -138,6 +152,8 @@ const Contact = () => {
                     placeholder="John Doe"
                     className="w-full"
                   />
+                  {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+
                 </div>
                 <div>
                   <label
@@ -156,6 +172,8 @@ const Contact = () => {
                     placeholder="john@example.com"
                     className="w-full"
                   />
+                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+
                 </div>
               </div>
 
@@ -176,6 +194,8 @@ const Contact = () => {
                   placeholder="Project Inquiry"
                   className="w-full"
                 />
+                {errors.subject && <p className="text-red-500 text-xs mt-1">{errors.subject}</p>}
+
               </div>
 
               <div>
@@ -195,6 +215,8 @@ const Contact = () => {
                   rows={6}
                   className="w-full"
                 />
+                {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
+
               </div>
 
               <Button
