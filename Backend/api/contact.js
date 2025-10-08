@@ -71,4 +71,10 @@ app.get("/api/contact", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// Express server, but it’s using a standalone app.listen(), which works locally but not on Vercel.
+//
+// Vercel’s backend runtime doesn’t keep servers running — it wraps your app into serverless functions instead.
+// So we need to export your Express app instead of starting it with app.listen().
+module.exports = app;
+//app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
